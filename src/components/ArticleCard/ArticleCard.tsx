@@ -1,5 +1,5 @@
 // src/components/ArticleCard/ArticleCard.tsx
-import { useState } from 'react' // We only need useState now
+import { useState } from 'react'
 import styled from 'styled-components'
 import { ArticleHeader } from './ArticleHeader'
 import { ArticleContent } from './ArticleContent'
@@ -39,7 +39,7 @@ interface ArticleProps {
   url: string
 }
 
-export default function ArticleCard({ 
+function ArticleCard({ 
   countryCode, 
   title,
   content,
@@ -68,3 +68,6 @@ export default function ArticleCard({
     </Card>
   )
 }
+
+// Add the default export separately
+export default ArticleCard

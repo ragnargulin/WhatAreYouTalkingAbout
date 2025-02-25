@@ -1,7 +1,8 @@
+// src/components/ArticleCard/ArticleContent.tsx
 import { useRef, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-const ContentWrapper = styled.div<{ showGradient: boolean; isExpanded: boolean }>`
+const ContentWrapper = styled.div<{ $showGradient: boolean; $isExpanded: boolean }>`
   position: relative;
   margin-top: 10px;
   
@@ -11,18 +12,18 @@ const ContentWrapper = styled.div<{ showGradient: boolean; isExpanded: boolean }
     bottom: 0;
     left: 0;
     width: 100%;
-    height: ${props => props.isExpanded ? '0' : '50px'};
-    background: ${props => props.isExpanded || !props.showGradient 
+    height: ${props => props.$isExpanded ? '0' : '50px'};
+    background: ${props => props.$isExpanded || !props.$showGradient 
       ? 'none' 
       : 'linear-gradient(transparent, white)'};
     pointer-events: none;
   }
 `
 
-const Content = styled.p<{ isExpanded: boolean }>`
+const Content = styled.p<{ $isExpanded: boolean }>`
   color: #666;
   line-height: 1.5;
-  max-height: ${props => props.isExpanded ? 'none' : '100px'};
+  max-height: ${props => props.$isExpanded ? 'none' : '100px'};
   overflow: hidden;
   margin: 0;
 `
@@ -44,8 +45,14 @@ export function ArticleContent({ content, isExpanded }: ArticleContentProps) {
   }, [content])
 
   return (
-    <ContentWrapper showGradient={isOverflowing} isExpanded={isExpanded}>
-      <Content ref={contentRef} isExpanded={isExpanded}>
+    <ContentWrapper 
+      $showGradient={isOverflowing} 
+      $isExpanded={isExpanded}
+    >
+      <Content 
+        ref={contentRef} 
+        $isExpanded={isExpanded}
+      >
         {content}
       </Content>
     </ContentWrapper>
