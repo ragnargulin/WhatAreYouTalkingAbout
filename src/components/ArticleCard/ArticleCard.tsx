@@ -1,3 +1,4 @@
+// src/components/ArticleCard/ArticleCard.tsx
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { ArticleHeader } from './ArticleHeader'
@@ -17,6 +18,20 @@ const Card = styled.div`
   }
 `
 
+const ViewOnReddit = styled.button`
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #ff4500;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  
+  &:hover {
+    background: #ff5722;
+  }
+`
+
 interface ArticleProps {
   id: number
   countryCode: string
@@ -24,9 +39,18 @@ interface ArticleProps {
   content: string
   isExpanded: boolean
   onExpand: (id: number) => void
+  url: string
 }
 
-function ArticleCard({ id, countryCode, title, content, isExpanded, onExpand }: ArticleProps) {
+export default function ArticleCard({ 
+  id, 
+  countryCode, 
+  title,
+  content,
+  isExpanded,
+  onExpand,
+  url 
+}: ArticleProps) {
   const navigate = useNavigate()
 
   const handleClick = () => {
@@ -38,12 +62,20 @@ function ArticleCard({ id, countryCode, title, content, isExpanded, onExpand }: 
     }
   }
 
+  const handleRedditClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    window.open(url, '_blank')
+  }
+
   return (
     <Card onClick={handleClick}>
       <ArticleHeader title={title} countryCode={countryCode} />
       <ArticleContent content={content} isExpanded={isExpanded} />
+      {isExpanded && (
+        <ViewOnReddit onClick={handleRedditClick}>
+          View on Reddit
+        </ViewOnReddit>
+      )}
     </Card>
   )
 }
-
-export default ArticleCard

@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+const HeaderWrapper = styled.div`
+  margin-bottom: 10px;
+`
+
 const Title = styled.h2`
   margin-bottom: 10px;
   color: #1a1a1a;
@@ -11,10 +15,6 @@ const CountryTag = styled.span`
   border-radius: 4px;
   font-size: 0.9em;
   color: #1976d2;
-`
-
-const HeaderWrapper = styled.div`
-  margin-bottom: 10px;
 `
 
 interface ArticleHeaderProps {
