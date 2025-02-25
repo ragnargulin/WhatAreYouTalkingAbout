@@ -1,12 +1,20 @@
-import { useState } from 'react'
-import { 
-  FeedContainer, 
-  Header, 
-  ArticleCard,
-  ArticleTitle,
-  CountryTag,
-  ArticleContent 
-} from './styles/NewsFeedStyles'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import styled from 'styled-components'
+import ArticleCard from './ArticleCard/ArticleCard'
+
+const FeedContainer = styled.div`
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+`
+
+const Header = styled.h1`
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 2.5rem;
+`
 
 interface Article {
   id: number
@@ -16,39 +24,58 @@ interface Article {
 }
 
 function NewsFeed() {
-  const [articles] = useState<Article[]>([
-    {
-      id: 1,
-      countryCode: 'SE',
-      title: 'Breaking News from Sweden',
-      content: 'This is some news from Sweden...'
-    },
-    {
-      id: 2,
-      countryCode: 'US',
-      title: 'Latest Updates from USA',
-      content: 'Something happened in the United States...'
-    },
-    {
-      id: 3,
-      countryCode: 'JP',
-      title: 'News from Japan',
-      content: 'A development in Japan...'
+    const { articleId } = useParams()
+    const [expandedArticleId, setExpandedArticleId] = useState<number | null>(
+      articleId ? Number(articleId) : null
+    )
+    
+    const [articles] = useState<Article[]>([
+      {
+        id: 1,
+        countryCode: 'SE',
+        title: 'Breaking News from Sweden',
+        content: 'This is some interesting news from Sweden... '.repeat(1)
+      },
+      {
+        id: 2,
+        countryCode: 'US',
+        title: 'Latest Updates from USA',
+        content: 'Something interesting happened in the United States... '.repeat(100)
+      },
+      {
+        id: 3,
+        countryCode: 'JP',
+        title: 'News from Japan',
+        content: 'An interesting development in Japan... '.repeat(10)
+      }
+    ])
+  
+    // Update expanded article when URL changes
+    useEffect(() => {
+      if (articleId) {
+        setExpandedArticleId(Number(articleId))
+      } else {
+        setExpandedArticleId(null)
+      }
+    }, [articleId])
+  
+    const handleExpand = (id: number) => {
+      setExpandedArticleId(expandedArticleId === id ? null : id)
     }
-  ])
-
-  return (
-    <FeedContainer>
-      <Header>Global News Feed</Header>
-      {articles.map(article => (
-        <ArticleCard key={article.id}>
-          <ArticleTitle>{article.title}</ArticleTitle>
-          <CountryTag>{article.countryCode}</CountryTag>
-          <ArticleContent>{article.content}</ArticleContent>
-        </ArticleCard>
-      ))}
-    </FeedContainer>
-  )
-}
-
-export default NewsFeed
+  
+    return (
+      <FeedContainer>
+        <Header>Global News Feed</Header>
+        {articles.map(article => (
+          <ArticleCard
+            key={article.id}
+            {...article}
+            isExpanded={article.id === expandedArticleId}
+            onExpand={handleExpand}
+          />
+        ))}
+      </FeedContainer>
+    )
+  }
+  
+  export default NewsFeed
