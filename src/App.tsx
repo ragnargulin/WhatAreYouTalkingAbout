@@ -3,7 +3,7 @@ import NewsFeed from './components/NewsFeed'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true }}>
       <Routes>
         <Route path="/" element={<NewsFeed />} />
         <Route path="/region/:region" element={<NewsFeed />} />

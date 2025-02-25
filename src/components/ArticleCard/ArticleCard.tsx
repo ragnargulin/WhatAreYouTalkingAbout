@@ -1,5 +1,5 @@
 // src/components/ArticleCard/ArticleCard.tsx
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react' // We only need useState now
 import styled from 'styled-components'
 import { ArticleHeader } from './ArticleHeader'
 import { ArticleContent } from './ArticleContent'
@@ -33,33 +33,22 @@ const ViewOnReddit = styled.button`
 `
 
 interface ArticleProps {
-  id: number
   countryCode: string
   title: string
   content: string
-  isExpanded: boolean
-  onExpand: (id: number) => void
   url: string
 }
 
 export default function ArticleCard({ 
-  id, 
   countryCode, 
   title,
   content,
-  isExpanded,
-  onExpand,
   url 
 }: ArticleProps) {
-  const navigate = useNavigate()
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const handleClick = () => {
-    onExpand(id)
-    if (!isExpanded) {
-      navigate(`/article/${id}`)
-    } else {
-      navigate('/')
-    }
+    setIsExpanded(!isExpanded)
   }
 
   const handleRedditClick = (e: React.MouseEvent) => {

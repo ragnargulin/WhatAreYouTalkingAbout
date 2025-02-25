@@ -1,10 +1,11 @@
 // src/components/NewsFeed.tsx
-import { useState, useEffect } from 'react' // Add useEffect back
+import { useState, useEffect, useCallback } from 'react' 
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { COUNTRY_SUBREDDITS } from '../services/redditCountries'
 import { fetchSubredditPosts, RedditPost } from '../services/redditApi'
 import ArticleCard from './ArticleCard/ArticleCard'
+import { translateText } from '../services/translationService'
 
 // Styled components
 const FeedContainer = styled.div`
@@ -62,6 +63,7 @@ interface FilterOptions {
     const [searchParams] = useSearchParams()
     
     const [articles, setArticles] = useState<Article[]>([])
+    const [originalArticles, setOriginalArticles] = useState<Article[]>([]) 
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     
@@ -89,19 +91,14 @@ interface FilterOptions {
     }
   
     // Fetch posts when filters change
-    useEffect(() => {
-      const fetchPosts = async () => {
+    const fetchPosts = useCallback(async () => {
         setIsLoading(true)
         setError(null)
-  
+    
         try {
-          // Get countries based on selected region
           const filteredCountries = getFilteredCountries(filterOptions.region || 'all')
           const selectedCountries = getRandomCountries(filteredCountries, 3)
-  
-          console.log('Fetching posts for countries:', selectedCountries.map(c => c.name))
-  
-          // Fetch posts from selected countries
+    
           const allPostsPromises = selectedCountries.map(async country => {
             const posts = await fetchSubredditPosts(country.subreddit)
             return posts.map(post => ({
@@ -110,17 +107,17 @@ interface FilterOptions {
               countryName: country.name
             }))
           })
-  
+    
           const allPosts = await Promise.all(allPostsPromises)
           let flattenedPosts = allPosts.flat()
-  
-          // Sort posts
+    
           if (filterOptions.sort === 'top') {
             flattenedPosts = flattenedPosts.sort((a, b) => b.score - a.score)
           } else {
             flattenedPosts = flattenedPosts.sort((a, b) => b.created_utc - a.created_utc)
           }
-  
+    
+          setOriginalArticles(flattenedPosts)
           setArticles(flattenedPosts)
         } catch (error) {
           setError(`Failed to load posts: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -128,11 +125,58 @@ interface FilterOptions {
         } finally {
           setIsLoading(false)
         }
-      }
-  
-      fetchPosts()
-    }, [filterOptions])
-  
+      }, [filterOptions.sort, filterOptions.region]) // Add dependencies
+    
+      // Wrap translateArticles in useCallback
+      const translateArticles = useCallback(async (articlesToTranslate: Article[]) => {
+        setIsLoading(true)
+        try {
+          const translatedArticles = await Promise.all(
+            articlesToTranslate.map(async article => {
+              if (!filterOptions.translate) {
+                return article
+              }
+              
+              const translatedTitle = await translateText(article.title)
+              const translatedContent = article.selftext 
+                ? await translateText(article.selftext)
+                : article.selftext
+    
+              return {
+                ...article,
+                title: translatedTitle,
+                selftext: translatedContent,
+                isTranslated: true
+              }
+            })
+          )
+          setArticles(translatedArticles)
+        } catch (error) {
+          setError('Translation failed')
+          console.error('Translation error:', error)
+        } finally {
+          setIsLoading(false)
+        }
+      }, [filterOptions.translate]) // Add dependency
+    
+      // Effect for fetching posts
+      useEffect(() => {
+        if (filterOptions.region || filterOptions.sort) {
+          fetchPosts()
+        }
+      }, [filterOptions.region, filterOptions.sort, fetchPosts]) // Add fetchPosts
+    
+      // Effect for translation
+      useEffect(() => {
+        if (originalArticles.length > 0) {
+          if (filterOptions.translate) {
+            translateArticles(originalArticles)
+          } else {
+            setArticles(originalArticles)
+          }
+        }
+      }, [filterOptions.translate, originalArticles, translateArticles]) // Add missing dependencies
+    
     const handleFilterChange = (newOptions: Partial<FilterOptions>) => {
       const updatedOptions = { ...filterOptions, ...newOptions }
       setFilterOptions(updatedOptions)
@@ -191,18 +235,15 @@ interface FilterOptions {
         {isLoading && <div>Loading posts...</div>}
         {error && <div style={{ color: 'red' }}>{error}</div>}
         
-        {!isLoading && !error && articles.map((article, index) => (
-          <ArticleCard
-            key={article.url}
-            id={index}
-            countryCode={article.countryCode}
-            title={`[${article.countryName}] ${article.title}`}
-            content={article.selftext || 'Click to view on Reddit'}
-            isExpanded={false}
-            onExpand={() => {}} // We can remove this since we're not using expansion anymore
-            url={article.url}
-          />
-        ))}
+        {!isLoading && !error && articles.map((article) => (
+  <ArticleCard
+    key={article.url}
+    countryCode={article.countryCode}
+    title={`[${article.countryName}] ${article.title}`}
+    content={article.selftext || 'Click to view on Reddit'}
+    url={article.url}
+  />
+))}
       </FeedContainer>
     )
   }
