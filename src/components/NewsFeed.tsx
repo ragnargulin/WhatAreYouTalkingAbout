@@ -7,6 +7,7 @@ import { fetchSubredditPosts, RedditPost } from '../services/redditApi'
 import { translateText } from '../services/translationService'
 import { FilterBar } from './FilterBar'
 import { ArticleList } from './ArticleList'
+import { CacheService } from '../services/cacheService'
 
 const FeedContainer = styled.div`
   padding: 20px;
@@ -30,16 +31,29 @@ interface FilterOptions {
 interface Article extends RedditPost {
   countryCode: string
   countryName: string
+  isTranslated?: boolean
 }
+
+const CACHED_ARTICLES_KEY = 'articles'
+const CACHED_ORIGINAL_ARTICLES_KEY = 'original_articles'
 
 export default function NewsFeed() {
   const navigate = useNavigate()
   const { region } = useParams()
   const [searchParams] = useSearchParams()
   
-  const [articles, setArticles] = useState<Article[]>([])
-  const [originalArticles, setOriginalArticles] = useState<Article[]>([]) 
-  const [isLoading, setIsLoading] = useState(true)
+  // Initialize state with cached data
+  const [articles, setArticles] = useState<Article[]>(() => {
+    const cached = CacheService.get<Article[]>(CACHED_ARTICLES_KEY, 'reddit')
+    return cached || []
+  })
+
+  const [originalArticles, setOriginalArticles] = useState<Article[]>(() => {
+    const cached = CacheService.get<Article[]>(CACHED_ORIGINAL_ARTICLES_KEY, 'reddit')
+    return cached || []
+  })
+
+  const [isLoading, setIsLoading] = useState(articles.length === 0)
   const [error, setError] = useState<string | null>(null)
   
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
@@ -48,7 +62,6 @@ export default function NewsFeed() {
     translate: searchParams.get('translate') === 'true'
   })
 
-  // Function to get countries based on selected region
   const getFilteredCountries = (selectedRegion: string) => {
     const countries = Object.values(COUNTRY_SUBREDDITS)
     if (selectedRegion === 'all') {
@@ -59,124 +72,160 @@ export default function NewsFeed() {
     )
   }
 
-  // Function to get random countries from filtered list
   const getRandomCountries = (countries: typeof COUNTRY_SUBREDDITS[keyof typeof COUNTRY_SUBREDDITS][], count: number) => {
     const shuffled = [...countries].sort(() => 0.5 - Math.random())
     return shuffled.slice(0, count)
   }
 
-  // Fetch posts when filters change
   const fetchPosts = useCallback(async () => {
     setIsLoading(true)
     setError(null)
-  
+
     try {
       const filteredCountries = getFilteredCountries(filterOptions.region || 'all')
       const selectedCountries = getRandomCountries(filteredCountries, 15)
-  
+
       const allPostsPromises = selectedCountries.map(async country => {
         const posts = await fetchSubredditPosts(country.subreddit)
-        // Take only the first valid post from each country
         return posts.slice(0, 1).map(post => ({
           ...post,
           countryCode: country.code,
           countryName: country.name
         }))
       })
-  
+
       const allPosts = await Promise.all(allPostsPromises)
       let flattenedPosts = allPosts.flat()
-  
+
       if (filterOptions.sort === 'top') {
         flattenedPosts = flattenedPosts.sort((a, b) => b.score - a.score)
       } else {
         flattenedPosts = flattenedPosts.sort((a, b) => b.created_utc - a.created_utc)
       }
-  
+
+      // Cache the results
+      CacheService.set(CACHED_ORIGINAL_ARTICLES_KEY, flattenedPosts, 'reddit')
       setOriginalArticles(flattenedPosts)
-      setArticles(flattenedPosts)
+
+      if (filterOptions.translate) {
+        const translatedPosts = await Promise.all(
+          flattenedPosts.map(async post => {
+            const translatedTitle = await translateText(post.title)
+            const translatedContent = post.selftext 
+              ? await translateText(post.selftext)
+              : post.selftext
+      
+            // Ensure boolean comparison
+            const titleChanged = translatedTitle !== post.title
+            const contentChanged = post.selftext ? translatedContent !== post.selftext : false
+      
+            return {
+              ...post,
+              title: translatedTitle,
+              selftext: translatedContent,
+              isTranslated: titleChanged || contentChanged
+            }
+          })
+        )
+        CacheService.set(CACHED_ARTICLES_KEY, translatedPosts, 'reddit')
+        setArticles(translatedPosts)
+      }
+       else {
+        CacheService.set(CACHED_ARTICLES_KEY, flattenedPosts, 'reddit')
+        setArticles(flattenedPosts)
+      }
     } catch (error) {
       setError(`Failed to load posts: ${error instanceof Error ? error.message : 'Unknown error'}`)
       console.error('Error loading posts:', error)
     } finally {
       setIsLoading(false)
     }
-  }, [filterOptions.sort, filterOptions.region])
+  }, [filterOptions.sort, filterOptions.region, filterOptions.translate])
 
-  const translateArticles = useCallback(async (articlesToTranslate: Article[]) => {
-    setIsLoading(true)
-    try {
-      const translatedArticles = await Promise.all(
-        articlesToTranslate.map(async article => {
-          if (!filterOptions.translate) {
-            return article
-          }
-          
-          const translatedTitle = await translateText(article.title)
-          const translatedContent = article.selftext 
-            ? await translateText(article.selftext)
-            : article.selftext
-
-          const wasTranslated = 
-            translatedTitle !== article.title || 
-            translatedContent !== article.selftext
-
-          return {
-            ...article,
-            title: translatedTitle,
-            selftext: translatedContent,
-            isTranslated: wasTranslated
-          }
-        })
-      )
-      setArticles(translatedArticles)
-    } catch (error) {
-      setError('Translation failed')
-      console.error('Translation error:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [filterOptions.translate])
-
-  useEffect(() => {
-    if (filterOptions.region || filterOptions.sort) {
-      fetchPosts()
-    }
-  }, [filterOptions.region, filterOptions.sort, fetchPosts])
-
-  useEffect(() => {
-    if (originalArticles.length > 0) {
-      if (filterOptions.translate) {
-        translateArticles(originalArticles)
-      } else {
-        setArticles(originalArticles)
+  const handleFilterChange = useCallback((newOptions: Partial<FilterOptions>) => {
+    const updatedOptions = { ...filterOptions, ...newOptions }
+    
+    // Define translateArticles inside handleFilterChange
+    const translateArticles = async (articlesToTranslate: Article[]): Promise<Article[]> => {
+      try {
+        return await Promise.all(
+          articlesToTranslate.map(async article => {
+            const translatedTitle = await translateText(article.title)
+            const translatedContent = article.selftext 
+              ? await translateText(article.selftext)
+              : article.selftext
+  
+            const titleChanged = translatedTitle !== article.title
+            const contentChanged = article.selftext ? translatedContent !== article.selftext : false
+  
+            return {
+              ...article,
+              title: translatedTitle,
+              selftext: translatedContent,
+              isTranslated: titleChanged || contentChanged
+            }
+          })
+        )
+      } catch (error) {
+        console.error('Translation error:', error)
+        throw error
       }
     }
-  }, [filterOptions.translate, originalArticles, translateArticles])
-
-  const handleFilterChange = (newOptions: Partial<FilterOptions>) => {
-    const updatedOptions = { ...filterOptions, ...newOptions }
+    
+    // If only translation is being toggled, handle it separately
+    if (Object.keys(newOptions).length === 1 && 'translate' in newOptions) {
+      setIsLoading(true)
+      if (newOptions.translate) {
+        translateArticles(originalArticles).then(translatedPosts => {
+          CacheService.set(CACHED_ARTICLES_KEY, translatedPosts, 'reddit')
+          setArticles(translatedPosts)
+          setIsLoading(false)
+        })
+      } else {
+        setArticles(originalArticles)
+        CacheService.set(CACHED_ARTICLES_KEY, originalArticles, 'reddit')
+        setIsLoading(false)
+      }
+    } else if ('region' in newOptions || 'sort' in newOptions) {
+      // Clear cache and fetch new posts for region or sort changes
+      CacheService.remove(`reddit_${CACHED_ARTICLES_KEY}`)
+      CacheService.remove(`reddit_${CACHED_ORIGINAL_ARTICLES_KEY}`)
+      setArticles([])
+      setOriginalArticles([])
+    }
+    
     setFilterOptions(updatedOptions)
-
-    // Update URL
+  
     const params = new URLSearchParams()
     if (updatedOptions.sort) params.set('sort', updatedOptions.sort)
     if (updatedOptions.translate) params.set('translate', 'true')
-
+  
     navigate(
       updatedOptions.region === 'all' 
         ? `/?${params}`
         : `/region/${updatedOptions.region}?${params}`
     )
-    
-  }
+  }, [filterOptions, navigate, originalArticles])
+
+  
   const handleRefresh = useCallback(() => {
-    // Clear existing articles
+    // Clear cache
+    CacheService.remove(`reddit_${CACHED_ARTICLES_KEY}`)
+    CacheService.remove(`reddit_${CACHED_ORIGINAL_ARTICLES_KEY}`)
+    
+    // Clear state
     setArticles([])
     setOriginalArticles([])
+    
     // Fetch new posts
     fetchPosts()
   }, [fetchPosts])
+
+  useEffect(() => {
+    if (articles.length === 0) {
+      fetchPosts()
+    }
+  }, [filterOptions.region, filterOptions.sort, fetchPosts, articles.length])
 
   return (
     <FeedContainer>
