@@ -5,19 +5,6 @@ export interface SubredditInfo {
     region: string    // Continent/region
   }
 
-  // src/services/redditCountries.ts
-export function getRandomCountries(count: number): SubredditInfo[] {
-    const countries = Object.values(COUNTRY_SUBREDDITS)
-    
-    // Fisher-Yates shuffle algorithm
-    for (let i = countries.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [countries[i], countries[j]] = [countries[j], countries[i]]
-    }
-    
-    // Take the first 'count' countries after shuffling
-    return countries.slice(0, count)
-  }
 
   export const COUNTRY_SUBREDDITS: Record<string, SubredditInfo> = {
 
@@ -191,7 +178,7 @@ export function getRandomCountries(count: number): SubredditInfo[] {
 'PL': { code: 'PL', name: 'Poland', subreddit: 'poland', region: 'Europe' },
 'PT': { code: 'PT', name: 'Portugal', subreddit: 'portugal', region: 'Europe' },
 'RO': { code: 'RO', name: 'Romania', subreddit: 'romania', region: 'Europe' },
-'RU': { code: 'RU', name: 'Russia', subreddit: 'russia', region: 'Europe' },
+'RU': { code: 'RU', name: 'Russia', subreddit: 'askarussian', region: 'Europe' },
 'SM': { code: 'SM', name: 'San Marino', subreddit: 'sanmarino', region: 'Europe' },
 'RS': { code: 'RS', name: 'Serbia', subreddit: 'serbia', region: 'Europe' },
 'SK': { code: 'SK', name: 'Slovakia', subreddit: 'slovakia', region: 'Europe' },

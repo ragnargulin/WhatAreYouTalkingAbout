@@ -69,29 +69,30 @@ export default function NewsFeed() {
   const fetchPosts = useCallback(async () => {
     setIsLoading(true)
     setError(null)
-
+  
     try {
       const filteredCountries = getFilteredCountries(filterOptions.region || 'all')
-      const selectedCountries = getRandomCountries(filteredCountries, 10)
-
+      const selectedCountries = getRandomCountries(filteredCountries, 15)
+  
       const allPostsPromises = selectedCountries.map(async country => {
         const posts = await fetchSubredditPosts(country.subreddit)
-        return posts.map(post => ({
+        // Take only the first valid post from each country
+        return posts.slice(0, 1).map(post => ({
           ...post,
           countryCode: country.code,
           countryName: country.name
         }))
       })
-
+  
       const allPosts = await Promise.all(allPostsPromises)
       let flattenedPosts = allPosts.flat()
-
+  
       if (filterOptions.sort === 'top') {
         flattenedPosts = flattenedPosts.sort((a, b) => b.score - a.score)
       } else {
         flattenedPosts = flattenedPosts.sort((a, b) => b.created_utc - a.created_utc)
       }
-
+  
       setOriginalArticles(flattenedPosts)
       setArticles(flattenedPosts)
     } catch (error) {

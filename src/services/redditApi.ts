@@ -61,7 +61,7 @@ export async function fetchSubredditPosts(subreddit: string): Promise<RedditPost
   }
 
   try {
-    const response = await fetch(`https://www.reddit.com/r/${subreddit}/hot.json?limit=25`)
+    const response = await fetch(`https://old.reddit.com/r/${subreddit}/hot.json?limit=15`)
     
     if (!response.ok) {
       console.warn(`Subreddit r/${subreddit} returned status ${response.status}`)
