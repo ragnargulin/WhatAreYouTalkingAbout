@@ -142,12 +142,16 @@ interface FilterOptions {
                 ? await translateText(article.selftext)
                 : article.selftext
     
+                const wasTranslated = 
+          translatedTitle !== article.title || 
+          translatedContent !== article.selftext
+
               return {
                 ...article,
                 title: translatedTitle,
                 selftext: translatedContent,
-                isTranslated: true
-              }
+                isTranslated: wasTranslated
+                          }
             })
           )
           setArticles(translatedArticles)
@@ -242,6 +246,7 @@ interface FilterOptions {
     title={`[${article.countryName}] ${article.title}`}
     content={article.selftext || 'Click to view on Reddit'}
     url={article.url}
+    isTranslated={article.isTranslated}
   />
 ))}
       </FeedContainer>

@@ -1,23 +1,38 @@
 // src/services/translationService.ts
-export async function translateText(text: string, targetLang: string = 'en'): Promise<string> {
-    try {
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
-      
-      const response = await fetch(url)
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`)
-      }
+import { CacheService } from './cacheService'
+
+export async function translateText(text: string): Promise<string> {
+  // Create a cache key from the text (you might want to hash long texts)
+  const cacheKey = text.slice(0, 100)
   
-      const data = await response.json()
-      
-      // Extract translated text from Google's response format
-      if (Array.isArray(data) && data[0] && Array.isArray(data[0])) {
-        return data[0].map(sentence => sentence[0]).join(" ")
-      }
-  
-      throw new Error("Unexpected response format")
-    } catch (error) {
-      console.error("Translation error:", error)
-      return text // Return original text if translation fails
-    }
+  // Check cache first
+  const cachedTranslation = CacheService.get<string>(cacheKey, 'translation')
+  if (cachedTranslation) {
+    return cachedTranslation
   }
+
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`
+    
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    
+    if (Array.isArray(data) && data[0] && Array.isArray(data[0])) {
+      const translatedText = data[0].map(sentence => sentence[0]).join(" ")
+      
+      // Cache the translation
+      CacheService.set(cacheKey, translatedText, 'translation')
+      
+      return translatedText
+    }
+
+    throw new Error("Unexpected response format")
+  } catch (error) {
+    console.error("Translation error:", error)
+    return text
+  }
+}

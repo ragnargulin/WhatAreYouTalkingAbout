@@ -18,10 +18,61 @@ export function getRandomCountries(count: number): SubredditInfo[] {
     // Take the first 'count' countries after shuffling
     return countries.slice(0, count)
   }
-  
+
   export const COUNTRY_SUBREDDITS: Record<string, SubredditInfo> = {
 
     
+
+// AFRICA
+'DZ': { code: 'DZ', name: 'Algeria', subreddit: 'algeria', region: 'Africa' },
+'AO': { code: 'AO', name: 'Angola', subreddit: 'Angola', region: 'Africa' },
+'BI': { code: 'BI', name: 'Burundi', subreddit: 'Burundi', region: 'Africa' },
+'CM': { code: 'CM', name: 'Cameroon', subreddit: 'Cameroon', region: 'Africa' },
+'CV': { code: 'CV', name: 'Cape Verde', subreddit: 'CapeVerde', region: 'Africa' },
+'CF': { code: 'CF', name: 'Central African Republic', subreddit: 'CAR_', region: 'Africa' },
+'TD': { code: 'TD', name: 'Chad', subreddit: 'RepublicofChad', region: 'Africa' },
+'KM': { code: 'KM', name: 'Comoros', subreddit: 'Comoros', region: 'Africa' },
+'CD': { code: 'CD', name: 'DR Congo', subreddit: 'Congo', region: 'Africa' },
+'DJ': { code: 'DJ', name: 'Djibouti', subreddit: 'Djibouti', region: 'Africa' },
+'EG': { code: 'EG', name: 'Egypt', subreddit: 'Egypt', region: 'Africa' },
+'GQ': { code: 'GQ', name: 'Equatorial Guinea', subreddit: 'EquatorialGuinea', region: 'Africa' },
+'ER': { code: 'ER', name: 'Eritrea', subreddit: 'Eritrea', region: 'Africa' },
+'ET': { code: 'ET', name: 'Ethiopia', subreddit: 'Ethiopia', region: 'Africa' },
+'GA': { code: 'GA', name: 'Gabon', subreddit: 'GABON', region: 'Africa' },
+'GM': { code: 'GM', name: 'Gambia', subreddit: 'Gambia', region: 'Africa' },
+'GH': { code: 'GH', name: 'Ghana', subreddit: 'ghana', region: 'Africa' },
+'GN': { code: 'GN', name: 'Guinea', subreddit: 'Guinea', region: 'Africa' },
+'CI': { code: 'CI', name: 'Ivory Coast', subreddit: 'IvoryCoast', region: 'Africa' },
+'KE': { code: 'KE', name: 'Kenya', subreddit: 'Kenya', region: 'Africa' },
+'LS': { code: 'LS', name: 'Lesotho', subreddit: 'Lesotho', region: 'Africa' },
+'LR': { code: 'LR', name: 'Liberia', subreddit: 'Liberia', region: 'Africa' },
+'LY': { code: 'LY', name: 'Libya', subreddit: 'Libya', region: 'Africa' },
+'MG': { code: 'MG', name: 'Madagascar', subreddit: 'Madagascar', region: 'Africa' },
+'MW': { code: 'MW', name: 'Malawi', subreddit: 'Malawi', region: 'Africa' },
+'ML': { code: 'ML', name: 'Mali', subreddit: 'Mali', region: 'Africa' },
+'MR': { code: 'MR', name: 'Mauritania', subreddit: 'Mauritania', region: 'Africa' },
+'MA': { code: 'MA', name: 'Morocco', subreddit: 'Morocco', region: 'Africa' },
+'MZ': { code: 'MZ', name: 'Mozambique', subreddit: 'Mozambique', region: 'Africa' },
+'NA': { code: 'NA', name: 'Namibia', subreddit: 'Namibia', region: 'Africa' },
+'NE': { code: 'NE', name: 'Niger', subreddit: 'Niger', region: 'Africa' },
+'NG': { code: 'NG', name: 'Nigeria', subreddit: 'Nigeria', region: 'Africa' },
+'CG': { code: 'CG', name: 'Republic of the Congo', subreddit: 'RepublicofCongo', region: 'Africa' },
+'RW': { code: 'RW', name: 'Rwanda', subreddit: 'Rwanda', region: 'Africa' },
+'SN': { code: 'SN', name: 'Senegal', subreddit: 'Senegal', region: 'Africa' },
+'SL': { code: 'SL', name: 'Sierra Leone', subreddit: 'SierraLeone', region: 'Africa' },
+'SO': { code: 'SO', name: 'Somalia', subreddit: 'Somalia', region: 'Africa' },
+'ZA': { code: 'ZA', name: 'South Africa', subreddit: 'southafrica', region: 'Africa' },
+'SS': { code: 'SS', name: 'South Sudan', subreddit: 'SouthSudan', region: 'Africa' },
+'SD': { code: 'SD', name: 'Sudan', subreddit: 'Sudan', region: 'Africa' },
+'SZ': { code: 'SZ', name: 'Eswatini', subreddit: 'Swaziland', region: 'Africa' },
+'TZ': { code: 'TZ', name: 'Tanzania', subreddit: 'tanzania', region: 'Africa' },
+'TG': { code: 'TG', name: 'Togo', subreddit: 'Togo', region: 'Africa' },
+'TN': { code: 'TN', name: 'Tunisia', subreddit: 'Tunisia', region: 'Africa' },
+'UG': { code: 'UG', name: 'Uganda', subreddit: 'Uganda', region: 'Africa' },
+'EH': { code: 'EH', name: 'Western Sahara', subreddit: 'WesternSahara', region: 'Africa' },
+'ZM': { code: 'ZM', name: 'Zambia', subreddit: 'Zambia', region: 'Africa' },
+'ZW': { code: 'ZW', name: 'Zimbabwe', subreddit: 'Zimbabwe', region: 'Africa' },
+
 
 // AMERICAS
 'AG': { code: 'AG', name: 'Antigua and Barbuda', subreddit: 'AntiguaBarbuda', region: 'Americas' },
@@ -36,7 +87,6 @@ export function getRandomCountries(count: number): SubredditInfo[] {
 'CO': { code: 'CO', name: 'Colombia', subreddit: 'colombia', region: 'Americas' },
 'CR': { code: 'CR', name: 'Costa Rica', subreddit: 'costarica', region: 'Americas' },
 'CU': { code: 'CU', name: 'Cuba', subreddit: 'cuba', region: 'Americas' },
-'DM': { code: 'DM', name: 'Dominica', subreddit: 'Dominica', region: 'Americas' },
 'DO': { code: 'DO', name: 'Dominican Republic', subreddit: 'DominicanRepublic', region: 'Americas' },
 'EC': { code: 'EC', name: 'Ecuador', subreddit: 'ecuador', region: 'Americas' },
 'SV': { code: 'SV', name: 'El Salvador', subreddit: 'ElSalvador', region: 'Americas' },

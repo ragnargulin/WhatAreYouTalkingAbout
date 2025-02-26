@@ -31,19 +31,30 @@ const ViewOnReddit = styled.button`
     background: #ff5722;
   }
 `
+const TranslatedBadge = styled.span`
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  margin-left: 8px;
+`
 
 interface ArticleProps {
   countryCode: string
   title: string
   content: string
   url: string
+  isTranslated?: boolean
 }
 
 function ArticleCard({ 
   countryCode, 
   title,
   content,
-  url 
+  url,
+  isTranslated 
+ 
 }: ArticleProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -58,7 +69,12 @@ function ArticleCard({
 
   return (
     <Card onClick={handleClick}>
-      <ArticleHeader title={title} countryCode={countryCode} />
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <ArticleHeader title={title} countryCode={countryCode} />
+        {isTranslated && (
+          <TranslatedBadge>Translated</TranslatedBadge>
+        )}
+      </div>
       <ArticleContent content={content} isExpanded={isExpanded} />
       {isExpanded && (
         <ViewOnReddit onClick={handleRedditClick}>
@@ -69,5 +85,4 @@ function ArticleCard({
   )
 }
 
-// Add the default export separately
 export default ArticleCard
