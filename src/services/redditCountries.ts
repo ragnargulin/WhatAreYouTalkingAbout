@@ -179,7 +179,7 @@ export interface SubredditInfo {
 'PT': { code: 'PT', name: 'Portugal', subreddit: 'portugal', region: 'Europe' },
 'RO': { code: 'RO', name: 'Romania', subreddit: 'romania', region: 'Europe' },
 'RU': { code: 'RU', name: 'Russia', subreddit: 'askarussian', region: 'Europe' },
-'SM': { code: 'SM', name: 'San Marino', subreddit: 'sanmarino', region: 'Europe' },
+'SM': { code: 'SM', name: 'San Marino', subreddit: 'sanmarino_', region: 'Europe' },
 'RS': { code: 'RS', name: 'Serbia', subreddit: 'serbia', region: 'Europe' },
 'SK': { code: 'SK', name: 'Slovakia', subreddit: 'slovakia', region: 'Europe' },
 'SI': { code: 'SI', name: 'Slovenia', subreddit: 'slovenia', region: 'Europe' },
