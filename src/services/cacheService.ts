@@ -74,6 +74,7 @@ interface CacheItem<T> {
     static remove(key: string) {
       try {
         localStorage.removeItem(key)
+        console.log('Removed from cache:', key)
       } catch (error) {
         console.error('Error removing from cache:', error)
       }

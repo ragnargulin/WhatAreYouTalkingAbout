@@ -168,7 +168,15 @@ export default function NewsFeed() {
         ? `/?${params}`
         : `/region/${updatedOptions.region}?${params}`
     )
+    
   }
+  const handleRefresh = useCallback(() => {
+    // Clear existing articles
+    setArticles([])
+    setOriginalArticles([])
+    // Fetch new posts
+    fetchPosts()
+  }, [fetchPosts])
 
   return (
     <FeedContainer>
@@ -176,6 +184,8 @@ export default function NewsFeed() {
       <FilterBar 
         filterOptions={filterOptions}
         onFilterChange={handleFilterChange}
+        onRefresh={handleRefresh}
+        isLoading={isLoading}
       />
       <ArticleList 
         articles={articles}
