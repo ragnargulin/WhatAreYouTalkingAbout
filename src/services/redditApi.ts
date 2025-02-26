@@ -95,14 +95,3 @@ export async function fetchSubredditPosts(subreddit: string): Promise<RedditPost
     return []
   }
 }
-
-// Optional: Add a function to clear cache for a specific subreddit
-export function clearSubredditCache(subreddit: string): void {
-  CacheService.remove(`reddit_${subreddit}`)
-}
-
-// Optional: Add a function to get fresh posts ignoring cache
-export async function fetchFreshSubredditPosts(subreddit: string): Promise<RedditPost[]> {
-  clearSubredditCache(subreddit)
-  return fetchSubredditPosts(subreddit)
-}

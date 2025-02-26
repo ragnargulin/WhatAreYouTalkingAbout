@@ -6,6 +6,7 @@ import { RedditPost } from '../services/redditApi'
 const LoadingMessage = styled.div`
   text-align: center;
   padding: 20px;
+  color: white;
 `
 
 const ErrorMessage = styled.div`
