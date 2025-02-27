@@ -5,6 +5,7 @@ import styled from 'styled-components'
 const ContentWrapper = styled.div<{ $showGradient: boolean; $isExpanded: boolean }>`
   position: relative;
   margin-top: 10px;
+
   
   &::after {
     content: '';
@@ -26,6 +27,7 @@ const Content = styled.p<{ $isExpanded: boolean }>`
   max-height: ${props => props.$isExpanded ? 'none' : '100px'};
   overflow: hidden;
   margin: 0;
+
 `
 
 interface ArticleContentProps {

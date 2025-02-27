@@ -10,7 +10,7 @@ import type { FilterOptions } from '../types'
 
 const FeedContainer = styled.div`
   padding: 20px;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
 `
 
