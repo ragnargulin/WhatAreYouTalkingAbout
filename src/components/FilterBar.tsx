@@ -10,6 +10,13 @@ const FilterBarContainer = styled.div`
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   align-items: center;
+  justify-content: space-between; // This helps separate filters and refresh button
+`
+
+const FilterGroup = styled.div`
+  display: flex;
+  gap: 20px;
+  align-items: center;
 `
 
 const RegionSelect = styled.select`
@@ -21,8 +28,9 @@ const RegionSelect = styled.select`
 const RefreshButton = styled.button`
   padding: 8px 16px;
   border-radius: 4px;
-  border: 1px solid #ddd;
-  background: white;
+  border: 1px solid #4CAF50;
+  background: #4CAF50;
+  color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -30,11 +38,11 @@ const RefreshButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: #f5f5f5;
+    background: #45a049;
   }
 
   &:active {
-    background: #e5e5e5;
+    background: #3d8b40;
   }
 
   &:disabled {
@@ -59,25 +67,21 @@ interface FilterOptions {
 }
 
 interface FilterBarProps {
-    filterOptions: FilterOptions
-    onFilterChange: (newOptions: Partial<FilterOptions>) => void
-    onRefresh: () => void
-    isLoading?: boolean
-  }
-
-interface FilterBarProps {
   filterOptions: FilterOptions
   onFilterChange: (newOptions: Partial<FilterOptions>) => void
+  onRefresh: () => void
+  isLoading?: boolean
 }
 
 export function FilterBar({ 
-    filterOptions, 
-    onFilterChange, 
-    onRefresh,
-    isLoading = false 
-  }: FilterBarProps) {
-    return (
-      <FilterBarContainer>
+  filterOptions, 
+  onFilterChange, 
+  onRefresh,
+  isLoading = false 
+}: FilterBarProps) {
+  return (
+    <FilterBarContainer>
+      <FilterGroup>
         <RegionSelect 
           value={filterOptions.region} 
           onChange={(e) => onFilterChange({ region: e.target.value })}
@@ -89,7 +93,7 @@ export function FilterBar({
           <option value="africa">Africa</option>
           <option value="oceania">Oceania</option>
         </RegionSelect>
-  
+
         <SortSelect 
           value={filterOptions.sort}
           onChange={(e) => onFilterChange({ 
@@ -99,7 +103,7 @@ export function FilterBar({
           <option value="latest">Latest</option>
           <option value="top">Top</option>
         </SortSelect>
-  
+
         <TranslateToggle>
           <input
             type="checkbox"
@@ -110,13 +114,14 @@ export function FilterBar({
           />
           Translate to English
         </TranslateToggle>
-  
-        <RefreshButton 
-          onClick={onRefresh}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Refreshing...' : '🔄 Refresh'}
-        </RefreshButton>
-      </FilterBarContainer>
-    )
-  }
+      </FilterGroup>
+
+      <RefreshButton 
+        onClick={onRefresh}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Refreshing...' : '🔄 Refresh'}
+      </RefreshButton>
+    </FilterBarContainer>
+  )
+}

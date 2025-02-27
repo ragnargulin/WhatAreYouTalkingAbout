@@ -55,7 +55,6 @@ export default function NewsFeed() {
     clearArticles,
     setArticles,
     setOriginalArticles,
-    setIsLoading
   } = useArticles(initialFilterOptions)
 
   const { filterOptions, handleFilterChange } = useFilterOptions({
@@ -65,7 +64,6 @@ export default function NewsFeed() {
     originalArticles,
     setArticles,
     setOriginalArticles,
-    setIsLoading
   })
 
   const handleRefresh = useCallback(() => {

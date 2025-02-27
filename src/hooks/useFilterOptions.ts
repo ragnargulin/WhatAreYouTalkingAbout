@@ -1,7 +1,6 @@
 // src/hooks/useFilterOptions.ts
 import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { translateText } from '../services/translationService'
 import { CacheService } from '../services/cacheService'
 import type { FilterOptions, Article } from '../types'
 
@@ -15,7 +14,6 @@ interface UseFilterOptionsProps {
   originalArticles: Article[]
   setArticles: (articles: Article[]) => void
   setOriginalArticles: (articles: Article[]) => void
-  setIsLoading: (isLoading: boolean) => void
 }
 
 export function useFilterOptions({
@@ -24,8 +22,7 @@ export function useFilterOptions({
   initialTranslate,
   originalArticles,
   setArticles,
-  setOriginalArticles,
-  setIsLoading
+  setOriginalArticles
 }: UseFilterOptionsProps) {
   const navigate = useNavigate()
   
@@ -38,44 +35,18 @@ export function useFilterOptions({
   const handleFilterChange = useCallback((newOptions: Partial<FilterOptions>) => {
     const updatedOptions = { ...filterOptions, ...newOptions }
     
-    const translateArticles = async (articlesToTranslate: Article[]): Promise<Article[]> => {
-      try {
-        return await Promise.all(
-          articlesToTranslate.map(async article => {
-            const translatedTitle = await translateText(article.title)
-            const translatedContent = article.selftext 
-              ? await translateText(article.selftext)
-              : article.selftext
-
-            const titleChanged = translatedTitle !== article.title
-            const contentChanged = article.selftext ? translatedContent !== article.selftext : false
-
-            return {
-              ...article,
-              title: translatedTitle,
-              selftext: translatedContent,
-              isTranslated: titleChanged || contentChanged
-            }
-          })
-        )
-      } catch (error) {
-        console.error('Translation error:', error)
-        throw error
-      }
-    }
-    
     if (Object.keys(newOptions).length === 1 && 'translate' in newOptions) {
-      setIsLoading(true)
-      if (newOptions.translate) {
-        translateArticles(originalArticles).then(translatedPosts => {
-          CacheService.set(CACHED_ARTICLES_KEY, translatedPosts, 'reddit')
-          setArticles(translatedPosts)
-          setIsLoading(false)
-        })
-      } else {
+      if (!newOptions.translate) {
+        // If turning translation off, use original articles
         setArticles(originalArticles)
-        CacheService.set(CACHED_ARTICLES_KEY, originalArticles, 'reddit')
-        setIsLoading(false)
+      } else {
+        // If turning translation on, check cache first
+        const cachedTranslated = CacheService.get<Article[]>(CACHED_ARTICLES_KEY, 'reddit')
+        if (cachedTranslated) {
+          setArticles(cachedTranslated)
+        } else {
+          setArticles([])
+        }
       }
     } else if ('region' in newOptions || 'sort' in newOptions) {
       CacheService.remove(`reddit_${CACHED_ARTICLES_KEY}`)
@@ -95,7 +66,7 @@ export function useFilterOptions({
         ? `/?${params}`
         : `/region/${updatedOptions.region}?${params}`
     )
-  }, [filterOptions, navigate, originalArticles, setArticles, setOriginalArticles, setIsLoading])
+  }, [filterOptions, navigate, originalArticles, setArticles, setOriginalArticles])
 
   return {
     filterOptions,
