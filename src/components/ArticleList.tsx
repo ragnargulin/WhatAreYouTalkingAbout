@@ -19,7 +19,6 @@ const ErrorMessage = styled.div`
 `
 
 interface Article extends RedditPost {
-  countryCode: string
   countryName: string
 }
 
@@ -38,7 +37,6 @@ export function ArticleList({ articles, isLoading, error }: ArticleListProps) {
       {articles.map((article) => (
         <ArticleCard
           key={article.url}
-          countryCode={article.countryCode}
           title={`[${article.countryName}] ${article.title}`}
           content={article.selftext || 'Click to view on Reddit'}
           url={article.url}

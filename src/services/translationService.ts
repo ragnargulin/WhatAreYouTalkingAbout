@@ -2,7 +2,6 @@
 import { CacheService } from './cacheService'
 
 export async function translateText(text: string): Promise<string> {
-  // Create a cache key from the text (you might want to hash long texts)
   const cacheKey = text.slice(0, 100)
   
   // Check cache first

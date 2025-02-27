@@ -8,7 +8,6 @@ export interface FilterOptions {
 }
 
 export interface Article extends RedditPost {
-  countryCode: string
   countryName: string
   isTranslated?: boolean
 }

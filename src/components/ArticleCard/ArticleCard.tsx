@@ -41,7 +41,6 @@ const TranslatedBadge = styled.span`
 `
 
 interface ArticleProps {
-  countryCode: string
   title: string
   content: string
   url: string
@@ -49,7 +48,6 @@ interface ArticleProps {
 }
 
 function ArticleCard({ 
-  countryCode, 
   title,
   content,
   url,
@@ -70,7 +68,7 @@ function ArticleCard({
   return (
     <Card onClick={handleClick}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <ArticleHeader title={title} countryCode={countryCode} />
+        <ArticleHeader title={title} />
         {isTranslated && (
           <TranslatedBadge>Translated</TranslatedBadge>
         )}

@@ -35,7 +35,6 @@ export function useArticles(filterOptions: FilterOptions) {
         const posts = await fetchSubredditPosts(country.subreddit)
         return posts.slice(0, 1).map(post => ({
           ...post,
-          countryCode: country.code,
           countryName: country.name
         }))
       })
