@@ -1,50 +1,8 @@
 // src/services/cacheService.ts
-interface CacheItem<T> {
-    data: T
-    timestamp: number
-  }
-  
-  const CACHE_DURATION = 1000 * 60 * 60 // 1 hour
-  const MAX_CACHE_ITEMS = 100 // Limit total cached items
-  
-  export class CacheService {
-    private static cleanOldCache() {
-      try {
-        const now = Date.now()
-        Object.keys(sessionStorage).forEach(key => {
-          if (key.startsWith('reddit_') || key.startsWith('translation_')) {
-            const item = JSON.parse(sessionStorage.getItem(key) || '')
-            if (now - item.timestamp > CACHE_DURATION) {
-              sessionStorage.removeItem(key)
-            }
-          }
-        })
-  
-        // If we have too many items, remove the oldest ones
-        const cacheKeys = Object.keys(sessionStorage)
-          .filter(key => key.startsWith('reddit_') || key.startsWith('translation_'))
-          .sort((a, b) => {
-            const aTime = JSON.parse(sessionStorage.getItem(a) || '').timestamp
-            const bTime = JSON.parse(sessionStorage.getItem(b) || '').timestamp
-            return aTime - bTime
-          })
-  
-        while (cacheKeys.length > MAX_CACHE_ITEMS) {
-          sessionStorage.removeItem(cacheKeys.shift()!)
-        }
-      } catch (error) {
-        console.error('Error cleaning cache:', error)
-      }
-    }
-  
+export class CacheService {
     static set<T>(key: string, data: T, prefix: 'reddit' | 'translation') {
       try {
-        this.cleanOldCache()
-        const cacheItem: CacheItem<T> = {
-          data,
-          timestamp: Date.now()
-        }
-        sessionStorage.setItem(`${prefix}_${key}`, JSON.stringify(cacheItem))
+        sessionStorage.setItem(`${prefix}_${key}`, JSON.stringify(data))
       } catch (error) {
         console.error('Error setting cache:', error)
       }
@@ -54,27 +12,16 @@ interface CacheItem<T> {
       try {
         const item = sessionStorage.getItem(`${prefix}_${key}`)
         if (!item) return null
-  
-        const cacheItem: CacheItem<T> = JSON.parse(item)
-        
-        // Check if cache is still valid
-        if (Date.now() - cacheItem.timestamp > CACHE_DURATION) {
-          sessionStorage.removeItem(`${prefix}_${key}`)
-          return null
-        }
-  
-        return cacheItem.data
+        return JSON.parse(item)
       } catch (error) {
         console.error('Error getting cache:', error)
         return null
       }
     }
   
-    // Add the remove method
     static remove(key: string) {
       try {
         sessionStorage.removeItem(key)
-        console.log('Removed from cache:', key)
       } catch (error) {
         console.error('Error removing from cache:', error)
       }

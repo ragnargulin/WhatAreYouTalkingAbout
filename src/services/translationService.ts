@@ -37,7 +37,6 @@ function calculateTextDifference(original: string, translated: string): number {
 }
 
 export async function translateText(text: string): Promise<TranslationResult> {
-  // If it's clearly English, return original text
   if (isEnglishText(text)) {
     return {
       text: text,
