@@ -11,26 +11,26 @@ interface CacheItem<T> {
     private static cleanOldCache() {
       try {
         const now = Date.now()
-        Object.keys(localStorage).forEach(key => {
+        Object.keys(sessionStorage).forEach(key => {
           if (key.startsWith('reddit_') || key.startsWith('translation_')) {
-            const item = JSON.parse(localStorage.getItem(key) || '')
+            const item = JSON.parse(sessionStorage.getItem(key) || '')
             if (now - item.timestamp > CACHE_DURATION) {
-              localStorage.removeItem(key)
+              sessionStorage.removeItem(key)
             }
           }
         })
   
         // If we have too many items, remove the oldest ones
-        const cacheKeys = Object.keys(localStorage)
+        const cacheKeys = Object.keys(sessionStorage)
           .filter(key => key.startsWith('reddit_') || key.startsWith('translation_'))
           .sort((a, b) => {
-            const aTime = JSON.parse(localStorage.getItem(a) || '').timestamp
-            const bTime = JSON.parse(localStorage.getItem(b) || '').timestamp
+            const aTime = JSON.parse(sessionStorage.getItem(a) || '').timestamp
+            const bTime = JSON.parse(sessionStorage.getItem(b) || '').timestamp
             return aTime - bTime
           })
   
         while (cacheKeys.length > MAX_CACHE_ITEMS) {
-          localStorage.removeItem(cacheKeys.shift()!)
+          sessionStorage.removeItem(cacheKeys.shift()!)
         }
       } catch (error) {
         console.error('Error cleaning cache:', error)
@@ -44,7 +44,7 @@ interface CacheItem<T> {
           data,
           timestamp: Date.now()
         }
-        localStorage.setItem(`${prefix}_${key}`, JSON.stringify(cacheItem))
+        sessionStorage.setItem(`${prefix}_${key}`, JSON.stringify(cacheItem))
       } catch (error) {
         console.error('Error setting cache:', error)
       }
@@ -52,14 +52,14 @@ interface CacheItem<T> {
   
     static get<T>(key: string, prefix: 'reddit' | 'translation'): T | null {
       try {
-        const item = localStorage.getItem(`${prefix}_${key}`)
+        const item = sessionStorage.getItem(`${prefix}_${key}`)
         if (!item) return null
   
         const cacheItem: CacheItem<T> = JSON.parse(item)
         
         // Check if cache is still valid
         if (Date.now() - cacheItem.timestamp > CACHE_DURATION) {
-          localStorage.removeItem(`${prefix}_${key}`)
+          sessionStorage.removeItem(`${prefix}_${key}`)
           return null
         }
   
@@ -73,7 +73,7 @@ interface CacheItem<T> {
     // Add the remove method
     static remove(key: string) {
       try {
-        localStorage.removeItem(key)
+        sessionStorage.removeItem(key)
         console.log('Removed from cache:', key)
       } catch (error) {
         console.error('Error removing from cache:', error)

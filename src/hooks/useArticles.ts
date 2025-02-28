@@ -1,5 +1,5 @@
 // src/hooks/useArticles.ts
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { CacheService } from '../services/cacheService'
 import { fetchSubredditPosts } from '../services/redditApi'
 import { translateText } from '../services/translationService'
@@ -8,6 +8,20 @@ import type { Article, FilterOptions } from '../types'
 
 const CACHED_ARTICLES_KEY = 'articles'
 const CACHED_ORIGINAL_ARTICLES_KEY = 'original_articles'
+
+async function translatePost(post: Article) {
+  const titleTranslation = await translateText(post.title)
+  const contentTranslation = post.selftext 
+    ? await translateText(post.selftext)
+    : { text: post.selftext, needsTranslation: false }
+
+  return {
+    ...post,
+    title: titleTranslation.text,
+    selftext: contentTranslation.text,
+    isTranslated: titleTranslation.needsTranslation || contentTranslation.needsTranslation
+  }
+}
 
 export function useArticles(filterOptions: FilterOptions) {
   const [articles, setArticles] = useState<Article[]>(() => {
@@ -28,54 +42,37 @@ export function useArticles(filterOptions: FilterOptions) {
     setError(null)
 
     try {
+      // Fetch and prepare posts
       const filteredCountries = getFilteredCountries(filterOptions.region || 'all')
       const selectedCountries = getRandomCountries(filteredCountries, 15)
+      const allPosts = await Promise.all(
+        selectedCountries.map(async country => {
+          const posts = await fetchSubredditPosts(country.subreddit)
+          return posts.slice(0, 1).map(post => ({
+            ...post,
+            countryName: country.name
+          }))
+        })
+      )
 
-      const allPostsPromises = selectedCountries.map(async country => {
-        const posts = await fetchSubredditPosts(country.subreddit)
-        return posts.slice(0, 1).map(post => ({
-          ...post,
-          countryName: country.name
-        }))
-      })
+      // Sort posts
+      const flattenedPosts = allPosts.flat().sort((a: Article, b: Article) => 
+        filterOptions.sort === 'top' 
+          ? b.score - a.score 
+          : b.created_utc - a.created_utc
+      )
 
-      const allPosts = await Promise.all(allPostsPromises)
-      let flattenedPosts = allPosts.flat()
-
-      if (filterOptions.sort === 'top') {
-        flattenedPosts = flattenedPosts.sort((a, b) => b.score - a.score)
-      } else {
-        flattenedPosts = flattenedPosts.sort((a, b) => b.created_utc - a.created_utc)
-      }
-
+      // Save original posts
       CacheService.set(CACHED_ORIGINAL_ARTICLES_KEY, flattenedPosts, 'reddit')
       setOriginalArticles(flattenedPosts)
 
-      if (filterOptions.translate) {
-        const translatedPosts = await Promise.all(
-          flattenedPosts.map(async post => {
-            const translatedTitle = await translateText(post.title)
-            const translatedContent = post.selftext 
-              ? await translateText(post.selftext)
-              : post.selftext
+      // Handle translation if needed
+      const finalPosts = filterOptions.translate
+        ? await Promise.all(flattenedPosts.map(translatePost))
+        : flattenedPosts
 
-            const titleChanged = translatedTitle !== post.title
-            const contentChanged = post.selftext ? translatedContent !== post.selftext : false
-
-            return {
-              ...post,
-              title: translatedTitle,
-              selftext: translatedContent,
-              isTranslated: titleChanged || contentChanged
-            }
-          })
-        )
-        CacheService.set(CACHED_ARTICLES_KEY, translatedPosts, 'reddit')
-        setArticles(translatedPosts)
-      } else {
-        CacheService.set(CACHED_ARTICLES_KEY, flattenedPosts, 'reddit')
-        setArticles(flattenedPosts)
-      }
+      CacheService.set(CACHED_ARTICLES_KEY, finalPosts, 'reddit')
+      setArticles(finalPosts)
     } catch (error) {
       setError(`Failed to load posts: ${error instanceof Error ? error.message : 'Unknown error'}`)
       console.error('Error loading posts:', error)
@@ -84,12 +81,34 @@ export function useArticles(filterOptions: FilterOptions) {
     }
   }, [filterOptions.sort, filterOptions.region, filterOptions.translate])
 
+  const handleTranslationToggle = useCallback(async () => {
+    if (!originalArticles.length) return
+
+    setIsLoading(true)
+    try {
+      const finalPosts = filterOptions.translate
+        ? await Promise.all(originalArticles.map(translatePost))
+        : originalArticles
+
+      CacheService.set(CACHED_ARTICLES_KEY, finalPosts, 'reddit')
+      setArticles(finalPosts)
+    } catch (error) {
+      console.error('Translation error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [filterOptions.translate, originalArticles])
+
   const clearArticles = useCallback(() => {
     CacheService.remove(`reddit_${CACHED_ARTICLES_KEY}`)
     CacheService.remove(`reddit_${CACHED_ORIGINAL_ARTICLES_KEY}`)
     setArticles([])
     setOriginalArticles([])
   }, [])
+
+  useEffect(() => {
+    handleTranslationToggle()
+  }, [filterOptions.translate, handleTranslationToggle])
 
   return {
     articles,
