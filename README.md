@@ -1,50 +1,57 @@
-# React + TypeScript + Vite
+# What R U Talking About?!
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+What R U Talking About?! är en React-applikation som visar inlägg från olika länders Reddit-forum och erbjuder översättning till engelska. Användaren kan filtrera inlägg efter region, sortera efter popularitet/datum och översätta innehållet.
 
-Currently, two official plugins are available:
+[Live demo](https://whatareyoutalkingabout.netlify.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Funktioner
+- Visar Reddit-inlägg från slumpmässigt valda länder
+- Filtrering efter världsdelar
+- Sortering efter popularitet eller datum
+- Översättning till engelska
+- Cachning av inlägg och översättningar
 
-## Expanding the ESLint configuration
+## Teknologier
+- React med TypeScript
+- Styled Components för styling
+- React Router för URL-hantering
+- Reddit API för inlägg
+- Google Translate API för översättningar
+- Session Storage för cachning
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Installation
+Klona repot:
+```bash
+git clone https://github.com/ragnargulin/whatareyoutalkingabout.git
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+Installera dependencies:
+```bash
+npm install
 ```
+
+Starta utvecklingsservern:
+```bash
+npm run dev
+```
+
+
+
+##Krav för Godkänt
+[x] Minst 6 komponenter varav 2 är "statefulla"
+- NewsFeed (stateful)
+- FilterBar (stateful)
+- ArticleCard
+- ArticleHeader
+- ArticleContent
+- ArticleList
+[x]React Router används för URL-uppdatering
+[x]Git & GitHub har använts
+[x]README.md fil finns
+[x]Inlämning är i tid
+[x]Muntlig presentation genomförd
+
+##Krav för Väl Godkänt
+[x]Alla G-krav är uppfyllda
+[x]Styled Components används för CSS
+[x]Data hämtas från Reddit API och Google Translate API
