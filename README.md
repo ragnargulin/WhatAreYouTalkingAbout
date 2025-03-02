@@ -38,20 +38,23 @@ npm run dev
 
 
 ##Krav för Godkänt
-[x] Minst 6 komponenter varav 2 är "statefulla"
+
+1. [x] Minst 6 komponenter varav 2 är "statefulla"
 - NewsFeed (stateful)
 - FilterBar (stateful)
 - ArticleCard
 - ArticleHeader
 - ArticleContent
 - ArticleList
-[x]React Router används för URL-uppdatering
-[x]Git & GitHub har använts
-[x]README.md fil finns
-[x]Inlämning är i tid
-[x]Muntlig presentation genomförd
+2. [x]React Router används för URL-uppdatering
+3. [x]Git & GitHub har använts
+4. [x]README.md fil finns
+5. [x]Inlämning är i tid
+6. [x]Muntlig presentation genomförd
+
 
 ##Krav för Väl Godkänt
-[x]Alla G-krav är uppfyllda
-[x]Styled Components används för CSS
-[x]Data hämtas från Reddit API och Google Translate API
+
+7. [x]Alla G-krav är uppfyllda
+8. [x]Styled Components används för CSS
+9. [x]Data hämtas från Reddit API och Google Translate API

@@ -32,7 +32,7 @@ export interface SubredditInfo {
   'BI': { code: 'BI', name: 'Burundi', subreddit: 'Burundi', region: 'Africa' },
   'CM': { code: 'CM', name: 'Cameroon', subreddit: 'Cameroon', region: 'Africa' },
   'CV': { code: 'CV', name: 'Cape Verde', subreddit: 'CapeVerde', region: 'Africa' },
-  'CF': { code: 'CF', name: 'Central African Republic', subreddit: 'CAR_', region: 'Africa' },
+  'CF': { code: 'CF', name: 'Central African Republic', subreddit: 'CAfricanRepublic', region: 'Africa' },
   'TD': { code: 'TD', name: 'Chad', subreddit: 'RepublicofChad', region: 'Africa' },
   'KM': { code: 'KM', name: 'Comoros', subreddit: 'Comoros', region: 'Africa' },
   'CD': { code: 'CD', name: 'DR Congo', subreddit: 'Congo', region: 'Africa' },
@@ -109,7 +109,7 @@ export interface SubredditInfo {
   'VC': { code: 'VC', name: 'Saint Vincent and the Grenadines', subreddit: 'SVG', region: 'Americas' },
   'SR': { code: 'SR', name: 'Suriname', subreddit: 'suriname', region: 'Americas' },
   'TT': { code: 'TT', name: 'Trinidad and Tobago', subreddit: 'TrinidadAndTobago', region: 'Americas' },
-  'US': { code: 'US', name: 'United States', subreddit: 'news', region: 'Americas' },
+  'US': { code: 'US', name: 'United States', subreddit: 'usa', region: 'Americas' },
   'UY': { code: 'UY', name: 'Uruguay', subreddit: 'uruguay', region: 'Americas' },
   'VE': { code: 'VE', name: 'Venezuela', subreddit: 'vzla', region: 'Americas' },
   

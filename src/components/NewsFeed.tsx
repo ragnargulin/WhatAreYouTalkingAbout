@@ -14,13 +14,6 @@ const FeedContainer = styled.div`
   margin: 0 auto;
 `
 
-const Header = styled.h1`
-  text-align: center;
-  margin-bottom: 30px;
-  color: white;
-  font-size: 3.5rem;
-`
-
 const LoadingMessage = styled.div`
   text-align: center;
   padding: 20px;
@@ -94,7 +87,6 @@ export default function NewsFeed() {
 
   return (
     <FeedContainer>
-      <Header>what r u talking about?!</Header>
       <FilterBar 
         filterOptions={filterOptions}
         onFilterChange={handleFilterChange}
