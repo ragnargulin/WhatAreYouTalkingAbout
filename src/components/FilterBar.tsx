@@ -10,19 +10,22 @@ const FilterBarContainer = styled.div`
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   align-items: center;
-  justify-content: space-between; // This helps separate filters and refresh button
+  justify-content: space-between; 
+  flex-wrap: wrap;
 `
 
 const FilterGroup = styled.div`
   display: flex;
   gap: 20px;
   align-items: center;
+  flex-wrap: wrap;
 `
 
 const RegionSelect = styled.select`
   padding: 8px;
   border-radius: 4px;
   border: 1px solid #ddd;
+  position: relative;
 `
 
 const RefreshButton = styled.button`
@@ -48,6 +51,10 @@ const RefreshButton = styled.button`
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+     @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
   }
 `
 
